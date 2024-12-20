@@ -1,0 +1,184 @@
+push 0
+pop bx
+push 0
+pop ax
+call main
+hlt
+
+
+main:
+in
+push 0
+push bx
+add
+pop ax
+push [ax]
+pop [ax]
+pop [ax]
+in
+push 1
+push bx
+add
+pop ax
+push [ax]
+pop [ax]
+pop [ax]
+in
+push 2
+push bx
+add
+pop ax
+push [ax]
+pop [ax]
+pop [ax]
+push 0
+push bx
+add
+pop ax
+push [ax]
+push 2
+POW
+push 0
+jae skip4
+push 1
+push bx
+add
+pop ax
+push [ax]
+push 1
+push bx
+add
+pop ax
+push [ax]
+MUL
+push 4
+push 0
+push bx
+add
+pop ax
+push [ax]
+push 2
+push bx
+add
+pop ax
+push [ax]
+MUL
+MUL
+SUB
+push 3
+push bx
+add
+pop ax
+push [ax]
+pop [ax]
+pop [ax]
+push 3
+push bx
+add
+pop ax
+push [ax]
+push 0
+jae skip6
+push 2
+out
+push -1
+push 1
+push bx
+add
+pop ax
+push [ax]
+MUL
+push 3
+push bx
+add
+pop ax
+push [ax]
+SQRT
+ADD
+push 2
+DIV
+out
+push -1
+push 1
+push bx
+add
+pop ax
+push [ax]
+MUL
+push 3
+push bx
+add
+pop ax
+push [ax]
+SQRT
+SUB
+push 2
+DIV
+out
+ret
+
+
+skip6:
+push -1
+push 3
+push bx
+add
+pop ax
+push [ax]
+MUL
+push 4
+push bx
+add
+pop ax
+push [ax]
+pop [ax]
+pop [ax]
+push 0
+jae skip12
+push 0
+out
+ret
+
+
+skip12:
+push 1
+out
+push -1
+push 1
+push bx
+add
+pop ax
+push [ax]
+push 2
+push 0
+push bx
+add
+pop ax
+push [ax]
+MUL
+DIV
+MUL
+out
+ret
+
+
+skip4:
+push 2
+push bx
+add
+pop ax
+push [ax]
+push 2
+POW
+push 0
+jae skip18
+push 0
+out
+ret
+
+
+skip18:
+push 0
+push 0
+DIV
+ret
