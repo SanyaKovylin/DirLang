@@ -3,6 +3,8 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 #include "utils.h"
 
@@ -11,12 +13,12 @@ size_t Read (const char *src, char **Buffer) {
     assert (src    != NULL);
     assert (Buffer != NULL);
 
-    int fo = open (src, O_RDONLY | O_BINARY);
+    int fo = open (src, O_RDONLY);
 
     struct stat st = {};
 
     stat (src, &st);
-    _off_t readlen = st.st_size;
+    off_t readlen = st.st_size;
 
     *Buffer = (char*) calloc (readlen + 1, sizeof (char));
 

@@ -1,0 +1,35 @@
+===================|IR dump|===================
+---------------(New Func)---------------------
+=================== FUNC DUMP ===================
+FUNCTION fact:
+    [var 0]
+    if not ([condition] ) goto L0;
+    [var 0]
+    [push result to stack]
+    [var 0]
+    [push result to stack]
+    [const 1]
+      mov from rax to rbx;
+    [pop to rax]
+[left] - [right];
+    [push result to stack]
+      = call fact();
+      mov from rax to rbx;
+    [pop to rax]
+[left] * [right];
+    return [value];
+L0:
+    [const 1]
+    return [value];
+================ END FUNC DUMP ================
+---------------(New Func)---------------------
+=================== FUNC DUMP ===================
+FUNCTION main:
+      = input();
+[var 0] =;
+    [var 0]
+    [push result to stack]
+      = call fact();
+    print [value];
+    return [value];
+================ END FUNC DUMP ================

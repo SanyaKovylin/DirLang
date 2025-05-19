@@ -2,20 +2,18 @@
 #include <stdio.h>
 
 #include "parser.h"
+#include "IR.h"
 #include "translator.h"
 #include "lexsint.h"
 
 int main(void){
     Function * e = NULL;
     int nfuncs = ParseFuncs("./Progs/1st", &e);
-    Translator(e, "arab.txt", nfuncs);
-
-//     e_tree T = {};
-//     TreeCtor(&T, NULL, "eee");
-//
-//     FParseInf("ea.txt", &T);
-//     T.curr_node = &T.head;
-//
-//     PrintTree(&T);
+    // Translator(e, "arab.txt", nfuncs);
+    IRFuncs* a = TranslateToIR(e, nfuncs);
+    ProcessIR(a);
+    puts("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+    DumpIR(a, nfuncs);
+    generate_elf_direct(a, "Build/Prog");
 }
 

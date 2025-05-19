@@ -1,6 +1,7 @@
 Include = -I Include
-COMP_FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ -Wmain -Wextra -Wall -g -pipe -fexceptions -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wempty-body -Wformat-security -Wformat=2 -Wignored-qualifiers -Wlogical-op -Wno-missing-field-initializers -Wnon-virtual-dtor -Woverloaded-virtual -Wpointer-arith -Wsign-promo -Wstack-usage=8192 -Wstrict-aliasing -Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -Werror=vla -D_DEBUG -D_EJUDGE_CLIENT_SIDE
+COMP_FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Weffc++ -Wmain -Wextra -Wall -g -pipe -fexceptions -Wcast-qual -Wconversion -Wctor-dtor-privacy -Wempty-body -Wformat-security -Wformat=2 -Wignored-qualifiers -Wlogical-op -Wno-missing-field-initializers -Wnon-virtual-dtor -Woverloaded-virtual -Wpointer-arith -Wsign-promo -Wstack-usage=8192 -Wstrict-aliasing -Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -Werror=vla -D_DEBUG -D_EJUDGE_CLIENT_SIDE
 COMP_FLAGS += $(Include)
+# COMP_FLAGS += -fsanitize=address
 CC = g++
 MK_FLAGS = -p
 RM_FLAGS = -rf
@@ -15,8 +16,10 @@ Build = Build
 Source = Source
 Exe = Compiler.exe
 
-all: $(Build)/$(Exe)
+all: clean cls $(Build)/$(Exe)
 
+cls:
+	clear
 
 $(Build)/%.o : $(Source)/%.cpp | $(Build)
 	$(CC) $(COMP_FLAGS) $< -c -o $@
@@ -40,14 +43,17 @@ ifdef H
 endif
 	remove -rf $(wildcard *.o)
 
-run:
+run: all
 	$(Build)/$(Exe)
 
 clean:
-	rd /s /q $(Build)
+	rm -rf $(Build)
 
 test:
-	cls
+	$(Build)/Prog
+
+debug:
+	r2 -r Source/input_script.rr2 -d $(Build)/Prog
 
 
 

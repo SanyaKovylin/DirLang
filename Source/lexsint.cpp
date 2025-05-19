@@ -60,7 +60,7 @@ Key Keys[] = {
 e_err FParseInf(const char* srcfile, e_tree *Tree){
 
     Tokens *n = NULL;
-    printf("\nParsing .... %s\n", srcfile);
+    // printf("\nParsing .... %s\n", srcfile);
     e_node** save = Tree->curr_node;
 
     LexParse(srcfile, &n);
@@ -97,7 +97,7 @@ e_err LexParse(const char* srcfile, Tokens **nodes){
     if (buffer.buffer == NULL) return CALLOC_ERR;
     // if (buffer.len == 0) return TREE_OK;
 
-    printf("buffer: %s", buffer.buffer);
+    // printf("buffer: %s", buffer.buffer);
 
     while (buffer.len > buffer.readptr){
         ParseNext(&buffer, Nodes);
@@ -140,19 +140,19 @@ e_err ParseNext(Buffer *src, Tokens *Nodes){
     }
     else if (isdigit(readval) || (readval == '-' && isdigit(*(rptr + 1)))){
         new_node = GetNumber(src);
-        printf("NUM\n");
+        // printf("NUM\n");
     }
     else if (isalpha(readval) || readval == '\\'){
         new_node = GetWord(src);
-        printf("WORD\n");
+        // printf("WORD\n");
     }
     else if (readval == '(' || readval == ')'){
         new_node = GetBrace(src);
-        printf("Brace\n");
+        // printf("Brace\n");
     }
     else {
         new_node = GetOperator(src);
-        printf("Oper\n");
+        // printf("Oper\n");
     }
 
     if (new_node == NULL) return UNKNOWN_OPETOR;

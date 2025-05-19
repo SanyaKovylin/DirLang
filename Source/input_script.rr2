@@ -1,0 +1,4 @@
+#!/usr/bin/rarun2
+stdout=./ea.txt
+stdin=./Source/input.txt
+../Build/Prog

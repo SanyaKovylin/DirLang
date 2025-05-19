@@ -10,6 +10,11 @@
 
 #include "utils.h"
 
+#ifndef _WIN32
+    #define stricmp strcasecmp
+    #include <strings.h>
+#endif
+
 #define OPERATOR(name, num, ...)  name = num,
 typedef enum Operators {
     #include "operators.h"

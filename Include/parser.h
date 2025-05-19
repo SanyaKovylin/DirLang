@@ -3,6 +3,7 @@
 
 #include <dirent.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #include "expr_tree.h"
 
@@ -17,10 +18,11 @@ struct Function {
     char* name;
     e_tree *functree;
     char** args;
-    int nargs = 0;
+    int nargs;
     char **locals;
-    int nlocals = 0;
+    int nlocals;
 };
+
 
 #define KEYWORD(name, num, ...) name = num,
 

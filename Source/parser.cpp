@@ -2,53 +2,11 @@
 #include <stdio.h>
 #include <assert.h>
 
-
-// #include "Include/parser.h"
 #include "parser.h"
 #include "utils.h"
 #include "lexsint.h"
 #include "translator.h"
 
-// p_err Parser(const char* name){
-//
-//     DIR *dp;
-//     struct dirent *ep;
-//     dp = opendir (name);
-//     char path[100] = {};
-//     sprintf(path, "%s", name);
-//
-//     e_tree Tree = {};
-//     TreeCtor(&Tree, NULL, NULL);
-//
-//     if (dp != NULL){
-//         while (ep = readdir (dp)){
-//             char newpath[100] = {};
-//             sprintf(newpath, "%s/%s", path, ep->d_name);
-//
-//             if (ep->d_namlen > 2){
-//
-//                 ParseFld(ep->d_name, &Tree);
-//                 puts(ep->d_name);
-//                 Parser(newpath);
-//             }
-//         }
-//
-//         (void) closedir (dp);
-//
-//     }
-//
-//     return EX;
-// }
-//
-// p_err ParseFld(char *name, e_tree* Tree){
-//
-//     if (dirent *ptr = opendir(name)){
-//
-//
-//     }
-//
-//     return AX;
-// }
 
 ReservedNames ResNames = {};
 
@@ -59,8 +17,6 @@ int ParseFuncs(const char* namefld, Function** funcs){
 
     Function* fnc = (Function*) calloc (startnum, sizeof(Function));
     int cnt = 0;
-
-
 
     ParseReservedNames(dp);
     dp = opendir(namefld);
@@ -75,7 +31,6 @@ int ParseFuncs(const char* namefld, Function** funcs){
             fnc[cnt] = func;
             cnt++;
         }
-        // printf("here\n");
     }
 
     *funcs = fnc;
@@ -97,9 +52,8 @@ p_err ParseReservedNames(DIR* dp){
 
             Function fnc = {.name = ep->d_name, .args = (char**) calloc (startnum, sizeof(char*))};
             ParseFuncName(&fnc);
-            ResNames.names[ResNames.num] = (char*) calloc (strlen(fnc.name), sizeof(char));
+            ResNames.names[ResNames.num] = (char*) calloc (strlen(fnc.name) + 1, sizeof(char));
             memcpy(ResNames.names[ResNames.num], fnc.name, strlen(fnc.name));
-            // puts(ResNames.names[ResNames.num]);
             ResNames.num++;
         }
     }
@@ -121,19 +75,16 @@ Function ParseFunc(const char* name, dirent *fldptr){
     memcpy(new_func.name, fldptr->d_name, strlen(fldptr->d_name));
     ParseFuncName(&new_func);
 
-
-    // printf("endparse name = %s\n", new_func.name);
     TreeCtor(new_func.functree, NULL, name);
-
 
     char path[lenstr] = {};
     sprintf(path, "%s/%s", name, fldptr->d_name);
     ParseFuncBody(new_func.functree, path, &new_func);
     new_func.functree->curr_node = &new_func.functree->head;
-    PrintTree(new_func.functree);
+    // PrintTree(new_func.functree);
 
     new_func.functree->curr_node = &new_func.functree->head;
-    printptr(new_func.functree);
+    // printptr(new_func.functree);
     return new_func;
 }
 
@@ -194,7 +145,7 @@ p_err ParseFuncBody(e_tree *Tree, const char* fld, Function* curr_func){
             *Tree->curr_node = new_node;
             Tree->curr_node = &new_node->left;
 
-            puts(ep->d_name);
+            // puts(ep->d_name);
 
             DIR* dp1 = NULL;
 
@@ -202,7 +153,7 @@ p_err ParseFuncBody(e_tree *Tree, const char* fld, Function* curr_func){
                 ParseKeyword(Tree, ep, fld, curr_func);
             }
             else {
-                printf("expr found");
+                // printf("expr found");
                 ParseExpression(Tree, ep, fld, curr_func);
             }
             // puts("start expr");
@@ -224,38 +175,6 @@ p_err ParseKeyword(e_tree *Tree, dirent* ep, const char* fldpath, Function* curr
     skip1st
 
     ParseAddExpr(Tree, name + start);
-//     int end = start;
-//     while(name[end] != ' ' && name[end] != '(') end++;
-//     name[end] = '\0';
-//     char* word = name + start;
-//     start = end;
-//     while (name[start] != '(' && (name[start] == '\0' || name[start] == ' ')) start++;
-//     end = start;
-//     while (name[end] != ')') end++;
-//     char* expr = name + start + (name[start] == '(');
-//     name[end] ='\0';
-//
-//     puts("found");
-//     puts(word);
-//     puts(expr);
-//     puts("end found");
-//
-//     e_node* new_node = NULL;
-//
-//     #define KEYWORD(name, num, str, getsbool, fld, ...) \
-//         if (!stricmp(word, str) && fld){\
-//             puts(#name);\
-//             new_node = NewNodeKEYWORD(num, NULL, NULL);\
-//             *Tree->curr_node = new_node;\
-//             if (getsbool){\
-//                 Tree->curr_node = &new_node->left;\
-//                 ParseAddExpr(Tree, expr);\
-//             }\
-//         }
-//
-//     #include "keywords.h"
-//
-//     #undef KEYWORD
 
     e_node* new_node = *Tree->curr_node;
 
@@ -263,7 +182,7 @@ p_err ParseKeyword(e_tree *Tree, dirent* ep, const char* fldpath, Function* curr
     new_node->right = NULL;
 
     if (new_node != NULL){
-        puts(path);
+        // puts(path);
         Tree->curr_node = &new_node->right;
         ParseFuncBody(Tree, path, curr_func);
     }
@@ -290,8 +209,8 @@ p_err ParseExpression(e_tree *Tree, dirent* ep, const char* fldpath, Function* c
     char path[lenstr] = {};
     sprintf(path,"%s/%s", fldpath, ep->d_name);
     char *name = ep->d_name;
-    puts(path);
-    puts(name);
+    // puts(path);
+    // puts(name);
 
     skip1st
     RemoveLastDot(name);
@@ -329,7 +248,7 @@ p_err ParseExpression(e_tree *Tree, dirent* ep, const char* fldpath, Function* c
     bool is_var = new_node->type == VAR;
 
     if (is_var){
-        printf("VAR, %d", is_var);
+        // printf("VAR, %d", is_var);
         bool was = false;
         // new_node = NewNodeKEYWORD(EQUAL, NewNodeVAR(name[start], NULL, NULL), NULL);
         new_node = NewNodeKEYWORD(EQUAL, new_node, NULL);
@@ -337,7 +256,7 @@ p_err ParseExpression(e_tree *Tree, dirent* ep, const char* fldpath, Function* c
         for (int i = 0; i < curr_func->nlocals; i++){
             if (name[start] == curr_func->locals[i][0]){
                 was = true;
-                printf("%c", name[start]);
+                // printf("%c", name[start]);
             }
         }
 
@@ -349,8 +268,8 @@ p_err ParseExpression(e_tree *Tree, dirent* ep, const char* fldpath, Function* c
         // was = (find_var(curr_func, name[start]) == -1);
         // printf("find var: %d",find_var(curr_func, name[start]));
         if (!was){
-            puts("new variable");
-            printf("%s", &name[start]);
+            // puts("new variable");
+            // printf("%s", &name[start]);
             char *var = (char*) calloc (1, 1);
             memcpy(var, name + start, 1);
             curr_func->locals[curr_func->nlocals] = var;
@@ -358,14 +277,14 @@ p_err ParseExpression(e_tree *Tree, dirent* ep, const char* fldpath, Function* c
         }
     }
 
-    puts("ea");
+    // puts("ea");
 
     *Tree->curr_node = new_node;
     Tree->curr_node = &new_node->right;
 
-    printf("started parse %s", path);
+    // printf("started parse %s", path);
     FParseInf(path, Tree);
-    printf("%p", new_node->right);
+    // printf("%p", new_node->right);
     return EX;
 }
 

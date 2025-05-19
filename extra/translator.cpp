@@ -25,7 +25,7 @@ p_err Translator(Function *functions, const char* output, int nfuncs){
 
     funcs = &allfuncs;
 
-    for (int cnt = 0; cnt <nfuncs; cnt++){
+    for (int cnt = 0; cnt < nfuncs; cnt++){
 
         FuncPreamble(functions + cnt);
         // puts(functions[cnt].name);
@@ -107,7 +107,7 @@ p_err ParseFuncTree(e_tree *Tree, Function* curr_func){
             //  "add\n"
             //  "pop ax\n"
             //  "push [ax]\n"
-             "push[bx+%d]\n", find_var(curr_func, name));
+            "push[bx+%d]\n", find_var(curr_func, name));
 
             break;
             }
@@ -195,43 +195,35 @@ p_err ParseFuncTree(e_tree *Tree, Function* curr_func){
     return EX;
 }
 
-
-int find_var(Function* curr_func, const char name){
-
-    bool got_var = false;
-    printf("var %c\n", name);
-    for (int i = 0; i < curr_func->nargs && !got_var;i++){
-
-        if (curr_func->args[i][0] == name){
-            puts("found arg");
-
-            return i;
-        }
-    }
-
-    printf("nlocals: %d", curr_func->nlocals);
-
-    for (int i = 0; i < curr_func->nlocals && !got_var; i++){
-        if (*curr_func->locals[i] == name){
-            puts("found local");
-            // fprintf(mainstream,
-            // // "push %d\n"
-            // //  "push bx\n"
-            // //  "add\n"
-            // //  "pop ax\n"
-            // //  "push [ax]\n"
-            // "push[bx+%d]\n", i + curr_func->nargs);
-
-            return i + curr_func->nargs;
-
-        }
-        else{
-            printf("local name: %c", curr_func->locals[i][0] );
-        }
-    }
-
-    return -1;
-}
+// int find_var(Function* curr_func, const char name){
+//
+//     bool got_var = false;
+//     printf("var %c\n", name);
+//     for (int i = 0; i < curr_func->nargs && !got_var;i++){
+//
+//         if (curr_func->args[i][0] == name){
+//             puts("found arg");
+//
+//             return i;
+//         }
+//     }
+//
+//     printf("nlocals: %d", curr_func->nlocals);
+//
+//     for (int i = 0; i < curr_func->nlocals && !got_var; i++){
+//         if (*curr_func->locals[i] == name){
+//             puts("found local");
+//
+//             return i + curr_func->nargs;
+//
+//         }
+//         else{
+//             printf("local name: %c", curr_func->locals[i][0] );
+//         }
+//     }
+//
+//     return -1;
+// }
 
 void print_FUNC(e_node* curr, Function* curr_func){
 
