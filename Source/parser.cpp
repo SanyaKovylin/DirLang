@@ -10,6 +10,8 @@
 
 ReservedNames ResNames = {};
 
+#pragma GCC diagnostic ignored "-Wformat-overflow"
+
 int ParseFuncs(const char* namefld, Function** funcs){
 
     DIR *dp = opendir(namefld);
@@ -209,8 +211,8 @@ p_err ParseExpression(e_tree *Tree, dirent* ep, const char* fldpath, Function* c
     char path[lenstr] = {};
     sprintf(path,"%s/%s", fldpath, ep->d_name);
     char *name = ep->d_name;
-    // puts(path);
-    // puts(name);
+    puts(path);
+    puts(name);
 
     skip1st
     RemoveLastDot(name);
@@ -245,6 +247,7 @@ p_err ParseExpression(e_tree *Tree, dirent* ep, const char* fldpath, Function* c
         new_node = *Tree->curr_node;
     }
     // else {is_var = true; puts("here");}
+    assert(new_node != NULL);
     bool is_var = new_node->type == VAR;
 
     if (is_var){
@@ -287,7 +290,7 @@ p_err ParseExpression(e_tree *Tree, dirent* ep, const char* fldpath, Function* c
     // printf("%p", new_node->right);
     return EX;
 }
-
+#pragma GCC diagnostic error "-Wformat-overflow"
 //==========================================================================
 
 void RemoveLastDot(char *name){

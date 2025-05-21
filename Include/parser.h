@@ -32,7 +32,7 @@ enum Keywords {
 };
 
 #undef KEYWORD
-const int startnum = 4;
+const int startnum = 8;
 const int lenstr = 50;
 
 int ParseFuncs(const char* namefld, Function** funcs);

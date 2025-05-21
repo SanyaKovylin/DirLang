@@ -151,4 +151,5 @@ const char* get_reg_name(int reg_num);
 IRFuncs* TranslateToIR(Function* functions, int nfuncs);
 void ProcessIR(IRFuncs* funcs);
 void generate_elf_direct(IRFuncs* ir, const char* output_filename);
+void AddLibProt(IRFunction* funcs);
 #endif

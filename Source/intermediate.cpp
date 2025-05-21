@@ -119,21 +119,18 @@ static const char* op_to_str(IROperator op) {
         case OP_ARCCOS:
         case OP_LOG:
         case OP_LN:
-        case OP_E:
+        // case OP_E:
         case OP_PI:
         case OP_SQRT:
         default: return "?";
     }
 }
 
-
-
 IRFuncs* TranslateToIR(Function* functions, int nfuncs){
 
     IRFuncs* allfuncs = (IRFuncs*) calloc (1, sizeof(IRFuncs));
-    allfuncs->funcs = (IRFunction*) calloc (nfuncs, sizeof(IRFunction));
+    allfuncs->funcs = (IRFunction*) calloc (nfuncs + 3, sizeof(IRFunction));
     allfuncs->nfuncs = nfuncs;
-
 
     for (int cnt = 0; cnt < nfuncs; cnt++){
 
@@ -151,9 +148,15 @@ IRFuncs* TranslateToIR(Function* functions, int nfuncs){
         allfuncs->funcs[cnt].list = ir;
     }
 
+    AddLibProt(allfuncs->funcs + nfuncs);
+    allfuncs->nfuncs += 3;
+
     return allfuncs;
 }
 
+
+
+// list append?
 #define ADD_NODE(n) \
     {\
     IRList* newnode = (IRList*) calloc (1, sizeof(IRList)); \
@@ -177,6 +180,43 @@ IRFuncs* TranslateToIR(Function* functions, int nfuncs){
     Tree->curr_node = &curr->right;\
     ir = IRParseFuncTree(Tree, funcs, ir);\
 
+void AddLibProt(IRFunction* funcs){
+
+    // IRList* save = NULL;
+    //READ
+
+    funcs[0].nargs = 0;
+    funcs[0].nlocals = 0;
+    funcs[0].name = strdup("read");
+
+    IRList* ir = (IRList*) calloc (1, sizeof(IRList));
+    funcs[0].list = ir;
+    ir->node = create_start(funcs[0].name);
+
+    ADD_NODE(create_call(funcs[0].name, 0));
+    ADD_NODE(create_return());
+
+
+
+    //PRINT
+
+    funcs[1].nargs = 0;
+    funcs[1].nlocals = 0;
+    funcs[1].name = strdup("print");
+
+    ir = (IRList*) calloc (1, sizeof(IRList));
+    funcs[1].list = ir;
+    ir->node = create_start(funcs[1].name);
+
+    ADD_NODE(create_call(funcs[1].name, 0));
+    ADD_NODE(create_return());
+
+    //TERMINATE
+
+    funcs[2].nargs = 0;
+    funcs[2].nlocals = 0;
+    funcs[2].name = strdup("end");
+}
 
 IRList*  IRParseFuncTree(e_tree *Tree, IRFuncs* funcs, IRList* ir) {
 
@@ -184,6 +224,7 @@ IRList*  IRParseFuncTree(e_tree *Tree, IRFuncs* funcs, IRList* ir) {
     if (curr == NULL) return ir;
     // dump_ir(ir, stdout);
     printf("TYPE: %d \n", curr->type);
+    // На функции ->
     switch(curr->type) {
         case NUM:
             ADD_NODE(create_const(curr->value.number));

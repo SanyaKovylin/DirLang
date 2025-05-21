@@ -30,7 +30,10 @@ $(Build)/$(Exe): $(Objects) | $(Build)
 $(Build):
 	mkdir $(Build)
 
-
+asm:
+	rm -rf lib
+	mkdir lib
+	nasm -f elf64 -fpie asm/IO.s -o lib/IO.o
 
 cleanup:
 ifdef Cpp
@@ -45,6 +48,7 @@ endif
 
 run: all
 	$(Build)/$(Exe)
+	chmod 777 Build/Prog
 
 clean:
 	rm -rf $(Build)

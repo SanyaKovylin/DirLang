@@ -60,11 +60,11 @@ Key Keys[] = {
 e_err FParseInf(const char* srcfile, e_tree *Tree){
 
     Tokens *n = NULL;
-    // printf("\nParsing .... %s\n", srcfile);
+    printf("\nParsing .... %s\n", srcfile);
     e_node** save = Tree->curr_node;
 
     LexParse(srcfile, &n);
-    // printf("Tokens %p\n", n);
+    printf("Tokens %p\n", n);
     if (n != NULL)
         SintParse(Tree, n);
 
@@ -144,7 +144,7 @@ e_err ParseNext(Buffer *src, Tokens *Nodes){
     }
     else if (isalpha(readval) || readval == '\\'){
         new_node = GetWord(src);
-        // printf("WORD\n");
+        printf("WORD\n");
     }
     else if (readval == '(' || readval == ')'){
         new_node = GetBrace(src);
@@ -196,7 +196,7 @@ e_node *GetWord(Buffer *src){
     bool was_res = CheckReserve(word, &node);
 
     if (!was_res) node = NewNodeVAR(word[0], NULL, NULL);
-    // printf("%s", word);
+    printf("%s", word);
 
     return node;
 }
@@ -489,7 +489,7 @@ bool TryGetVar(e_node **node, e_node** start, e_node*** end){
     !TryGetOBrace(start, &e) &&
     !TryGetCBrace(start, &e) &&
     (*start)->value.var > 0){
-
+        puts("var");
         TRUE_CASE;
         return true;
     }

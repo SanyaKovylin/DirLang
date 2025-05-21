@@ -242,20 +242,20 @@ OPERATOR(LN,    10, "\\ln",     1, false, true , 1, {
     if (IsZeroNode(curr_node->right)) {*Tree->curr_node = NewNodeNUM(0, NULL, NULL); actions++;}
 }, "ln")
 
-OPERATOR(E,    11, "\\e",     0, false, false , 0, {
-    //e_node *new_node = NULL;
-    // curr_node = *Tree->curr_node;
-    new_node = NewNodeNUM(1, NULL, NULL);
-}, {
-    // x, y are given ealier
-    // get double z
-    z = M_E;
-}, {
-    // int actions = 0
-    //curr_node = *Tree->curr_node;
-}, "e")
+// OPERATOR(E,    11, "\\e",     0, false, false , 0, {
+//     //e_node *new_node = NULL;
+//     // curr_node = *Tree->curr_node;
+//     new_node = NewNodeNUM(1, NULL, NULL);
+// }, {
+//     // x, y are given ealier
+//     // get double z
+//     z = M_E;
+// }, {
+//     // int actions = 0
+//     //curr_node = *Tree->curr_node;
+// }, "e")
 
-OPERATOR(PI,    12, "\\pi",     0, false, false , 0, {
+OPERATOR(PI,    11, "\\pi",     0, false, false , 0, {
     //e_node *new_node = NULL;
     // curr_node = *Tree->curr_node;
     new_node = NewNodeNUM(1, NULL, NULL);
@@ -269,7 +269,7 @@ OPERATOR(PI,    12, "\\pi",     0, false, false , 0, {
 
 }, "pi")
 
-OPERATOR(SQRT,    13, "\\sqrt",     1, true, false , 0, {
+OPERATOR(SQRT,    12, "\\sqrt",     1, true, false , 0, {
     //e_node *new_node = NULL;
     // curr_node = *Tree->curr_node;
     new_node = NewNodeOPER(DIV,

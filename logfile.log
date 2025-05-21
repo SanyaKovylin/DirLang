@@ -25,11 +25,11 @@ L0:
 ---------------(New Func)---------------------
 =================== FUNC DUMP ===================
 FUNCTION main:
-      = input();
+      = call read();
 [var 0] =;
     [var 0]
     [push result to stack]
       = call fact();
-    print [value];
-    return [value];
+      = call print();
+      = call end();
 ================ END FUNC DUMP ================

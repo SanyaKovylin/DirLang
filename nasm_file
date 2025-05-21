@@ -1,0 +1,57 @@
+fact:
+push rbp
+mov rbp, rsp
+mov rax, [rbp - 16]
+test rax, rax
+je L0
+mov rax, [rbp - 16]
+push rax
+mov rax, [rbp - 16]
+push rax
+mov rax, 1
+mov rbx, rax
+pop rax
+sub rax, rbx
+push rax
+call fact
+add rsp, 8
+mov rbx, rax
+pop rax
+imul rax, rbx
+mov rsp, rbp
+pop rbp
+ret
+L0:
+mov rax, 1
+mov rsp, rbp
+pop rbp
+ret
+main:
+push rbp
+mov rbp, rsp
+sub rsp, 8
+call read
+mov [rbp - 0], rax
+mov rax, [rbp - 0]
+push rax
+call fact
+add rsp, 8
+call print
+call end
+read:
+push rbp
+mov rbp, rsp
+call read
+mov rsp, rbp
+pop rbp
+ret
+print:
+push rbp
+mov rbp, rsp
+call print
+mov rsp, rbp
+pop rbp
+ret
+end:
+push rbp
+mov rbp, rsp
