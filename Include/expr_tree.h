@@ -57,7 +57,7 @@ typedef struct ExprTreePath {
 typedef enum ExprTreeError{
     TREE_OK = 0,
     WRONG_TYPE = 1,
-    UNKNOWN_OPETOR = 2,
+    UNKNOWN_OPERATOR = 2,
     FOUND_VARIABLE_IN_COMPUTE = 3,
     CALLOC_ERR = 4,
 } e_err;

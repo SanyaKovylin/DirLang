@@ -16,7 +16,7 @@ Build = Build
 Source = Source
 Exe = Compiler.exe
 
-all: clean cls $(Build)/$(Exe)
+all: clean cls asm $(Build)/$(Exe)
 
 cls:
 	clear
@@ -30,10 +30,9 @@ $(Build)/$(Exe): $(Objects) | $(Build)
 $(Build):
 	mkdir $(Build)
 
-asm:
-	rm -rf lib
+asm: cleanlib
 	mkdir lib
-	nasm -f elf64 -fpie asm/IO.s -o lib/IO.o
+	nasm -f elf64 asm/IO.s -o lib/IO.o
 
 cleanup:
 ifdef Cpp
@@ -52,6 +51,9 @@ run: all
 
 clean:
 	rm -rf $(Build)
+
+cleanlib:
+	rm -rf lib
 
 test:
 	$(Build)/Prog

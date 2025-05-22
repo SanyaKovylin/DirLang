@@ -155,7 +155,7 @@ e_err ParseNext(Buffer *src, Tokens *Nodes){
         // printf("Oper\n");
     }
 
-    if (new_node == NULL) return UNKNOWN_OPETOR;
+    if (new_node == NULL) return UNKNOWN_OPERATOR;
 
     Nodes->buffer[Nodes->curr++] = new_node;
 

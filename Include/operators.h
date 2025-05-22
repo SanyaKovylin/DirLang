@@ -6,7 +6,7 @@ OPERATOR(ADD,    0, "+",        2, false, false, 3 , {
     //curr_node = *Tree->curr_node;
     new_node = NewNodeOPER(ADD, ETreeNodeDerivate(DerTree, curr_node->left), ETreeNodeDerivate(DerTree, curr_node->right));
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = x + y;
 }, {
@@ -21,7 +21,7 @@ OPERATOR(SUB,    1, "-",        2, false, false, 3, {
     // curr_node = *Tree->curr_node;
     new_node = NewNodeOPER(SUB, ETreeNodeDerivate(DerTree, curr_node->left), ETreeNodeDerivate(DerTree, curr_node->right));
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = x - y;
 }, {
@@ -40,7 +40,7 @@ OPERATOR(MUL,    2, "\\cdot",   2, false, false, 2, {
                     NewNodeOPER(MUL,ETreeNodeDerivate(DerTree, curr_node->left), ETreeNodeCopy(curr_node->right)),
                     NewNodeOPER(MUL,ETreeNodeDerivate(DerTree, curr_node->right), ETreeNodeCopy(curr_node->left)));
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = x * y;
 }, {
@@ -63,7 +63,7 @@ OPERATOR(DIV,    3, "\\frac",   2, true , true , 2, {
                         ETreeNodeCopy(curr_node->right),
                         NewNodeNUM(2, NULL, NULL)));
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = x / y;
 }, {
@@ -110,7 +110,7 @@ OPERATOR(POW,    4, "^",        2, false, true , 0, {
                                 NewNodeNUM(1, NULL, NULL))));
     }
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = pow(x, y);
 }, {
@@ -130,7 +130,7 @@ OPERATOR(SIN,    5, "\\sin",    1, false, true , 1, {
                     ETreeNodeDerivate(DerTree, curr_node->right),
                     NewNodeOPER(COS, NULL, ETreeNodeCopy(curr_node->right)));
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = sin(y);
 }, {
@@ -148,7 +148,7 @@ OPERATOR(COS,    6, "\\cos",    1, false, true , 1, {
                         NewNodeNUM(-1, NULL, NULL),
                         NewNodeOPER(SIN, NULL, ETreeNodeCopy(curr_node->right))));
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = cos(y);
 }, {
@@ -178,7 +178,7 @@ OPERATOR(ARCSIN, 7, "\\arcsin", 1, false, true , 1, {
                                 ETreeNodeCopy(curr_node->right),
                                 NewNodeNUM(2, NULL, NULL)))));
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = asin(y);
 }, {
@@ -201,7 +201,7 @@ OPERATOR(ARCCOS, 8, "\\arccos", 1, false, true , 1, {
                                     ETreeNodeCopy(curr_node->right),
                                     NewNodeNUM(2, NULL, NULL))), NewNodeNUM(0.5,NULL,NULL))));
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = acos(y);
 }, {
@@ -217,7 +217,7 @@ OPERATOR(LOG,    9, "\\log_",   2, true , true , 1, {
                    ETreeNodeDerivate(DerTree, NewNodeOPER(LN, NULL, curr_node->right)),
                     ETreeNodeDerivate(DerTree, NewNodeOPER(LN, NULL, curr_node->left)));
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = log(y)/log(x);
 }, {
@@ -247,7 +247,7 @@ OPERATOR(LN,    10, "\\ln",     1, false, true , 1, {
 //     // curr_node = *Tree->curr_node;
 //     new_node = NewNodeNUM(1, NULL, NULL);
 // }, {
-//     // x, y are given ealier
+//     // x, y are given earlier
 //     // get double z
 //     z = M_E;
 // }, {
@@ -260,7 +260,7 @@ OPERATOR(PI,    11, "\\pi",     0, false, false , 0, {
     // curr_node = *Tree->curr_node;
     new_node = NewNodeNUM(1, NULL, NULL);
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = M_PI;
 }, {
@@ -278,7 +278,7 @@ OPERATOR(SQRT,    12, "\\sqrt",     1, true, false , 0, {
                     NewNodeNUM(2, NULL,NULL),
                     ETreeNodeDerivate(DerTree, curr_node->right)));
 }, {
-    // x, y are given ealier
+    // x, y are given earlier
     // get double z
     z = sqrt(y);
 }, {

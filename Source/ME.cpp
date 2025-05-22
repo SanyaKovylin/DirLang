@@ -14,11 +14,11 @@ void ProcessIR(IRFuncs* funcs){
 #define type(curr) curr->node->type
 
 void ProcessList(IRList* ir, int is_main){
-
-    IRList* curr = ir;
+    if (!ir) return;
+    LList* curr = ir->start;
     while (curr != NULL && curr->next != NULL){
 
-        IRList* next = curr->next;
+        LList* next = curr->next;
         // printf("%p\n", next);
 
         if (type(curr) == IR_RES_PUSH &&
@@ -30,7 +30,7 @@ void ProcessList(IRList* ir, int is_main){
                 continue;
             }
             IRNode* n = create_mov(REG_RAX, next->node->pop_reg.num);
-            IRList* newnode = (IRList*) calloc (1, sizeof(IRList));
+            LList* newnode = (LList*) calloc (1, sizeof(LList));
 
             newnode->node = n;
             newnode->prev = curr->prev;
@@ -38,8 +38,8 @@ void ProcessList(IRList* ir, int is_main){
             curr->prev->next = newnode;
             newnode->next = next->next;
             next->next->prev = newnode;
-            free(curr->node); free(curr);
-            free(next->node); free(next);
+            // free(curr->node); free(curr);
+            // free(next->node); free(next);
             curr = newnode->next;
             continue;
         }
@@ -47,7 +47,7 @@ void ProcessList(IRList* ir, int is_main){
         if (type(curr) == IR_INPUT){
 
             IRNode* n = create_call("read", 0);
-            IRList* newnode = (IRList*) calloc (1, sizeof(IRList));
+            LList* newnode = (LList*) calloc (1, sizeof(LList));
 
             newnode->node = n;
             newnode->prev = curr->prev;
@@ -55,7 +55,7 @@ void ProcessList(IRList* ir, int is_main){
             curr->prev->next = newnode;
             newnode->next = next;
             next->prev = newnode;
-            free(curr->node); free(curr);
+            // free(curr->node); free(curr);
             curr = newnode->next;
             continue;
         }
@@ -63,7 +63,7 @@ void ProcessList(IRList* ir, int is_main){
         if (type(curr) == IR_PRINT){
 
             IRNode* n = create_call("print", 0);
-            IRList* newnode = (IRList*) calloc (1, sizeof(IRList));
+            LList* newnode = (LList*) calloc (1, sizeof(LList));
 
             newnode->node = n;
             newnode->prev = curr->prev;
@@ -71,7 +71,7 @@ void ProcessList(IRList* ir, int is_main){
             curr->prev->next = newnode;
             newnode->next = next;
             next->prev = newnode;
-            free(curr->node); free(curr);
+            // free(curr->node); free(curr);
             curr = newnode->next;
             continue;
         }
@@ -82,13 +82,13 @@ void ProcessList(IRList* ir, int is_main){
     if (is_main && curr != NULL){
 
         IRNode* n = create_call("end", 0);
-        IRList* newnode = (IRList*) calloc (1, sizeof(IRList));
+        LList* newnode = (LList*) calloc (1, sizeof(LList));
 
         newnode->node = n;
         newnode->prev = curr->prev;
         assert(curr->prev != NULL);
         curr->prev->next = newnode;
         newnode->next = NULL;
-        free(curr->node); free(curr);
+        // free(curr->node); free(curr);
     }
 }

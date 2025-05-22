@@ -3,128 +3,67 @@
 #include "IR.h"
 
 static int label_counter = 0;
+Function* current_function = NULL;
 
-static Function* current_function = NULL;
+// LList ========================================================================================
 
-void dump_ir(IRList *ir_list, FILE *out);
-int new_label();
-
-int new_label() {
-    return label_counter++;
+IRList* InitIR(const char* name){
+    IRList* ir = (IRList*) calloc (1, sizeof(IRList));
+    ir->start = (LList*) calloc (8, sizeof(LList));
+    ir->start->node = create_start(name);
+    ir->capacity = 8;
+    ir->count = 1;
+    return ir;
 }
 
-IRNode* create_ir_node(IRNodeType type) {
-    IRNode *node = (IRNode*) calloc (1, sizeof(IRNode));
-    node->type = type;
-    return node;
+void ListAppend(IRList* ir, IRNode* node){
+
+    if (ir->count == ir->capacity) {
+        ir->start = (LList*) realloc (ir->start, ir->capacity*2 * sizeof(LList));
+        ir->capacity *= 2;
+    }
+
+    LList* curr = ir->start + ir->count;
+    curr->prev = ir->start + ir->count - 1;
+    curr->node = node;
+    curr->prev->next = curr;
+    printf("%d %p %p\n", ir->count, curr->prev, curr);
+    ir->count++;
 }
 
-IRNode* create_input() {
-    IRNode *node = create_ir_node(IR_INPUT);
-    return node;
+void FreeIR(IRList* ir){
+
+    for (size_t i = 0; i < ir->count; i++){
+        free(ir->start[i].node);
+    }
+
+    free(ir->start);
+    free(ir);
 }
 
-IRNode* create_binop(IROperator op) {
-    IRNode *node = create_ir_node(IR_BINOP);
-    node->binop.op = op;
-    return node;
-}
+void Link(IRFuncs* funcs){
 
-IRNode* create_assign(int pos_dest) {
-    IRNode *node = create_ir_node(IR_ASSIGN);
-    node->assign.pos_dest = pos_dest;
-    return node;
-}
-
-IRNode* create_call(const char *func_name, int nargs) {
-    IRNode *node = create_ir_node(IR_CALL);
-    strncpy(node->call.func_name, func_name, sizeof(node->call.func_name));
-    node->call.nargs = nargs;
-    return node;
-}
-
-IRNode* create_cjump(int false_label) {
-    IRNode *node = create_ir_node(IR_CJUMP);
-    node->cjump.false_label = false_label;
-    return node;
-}
-
-IRNode* create_jump(int target_label) {
-    IRNode *node = create_ir_node(IR_JUMP);
-    node->jump.target_label = target_label;
-    return node;
-}
-
-IRNode* create_label(int label_num) {
-    IRNode *node = create_ir_node(IR_LABEL);
-    node->label.label_num = label_num;
-    return node;
-}
-
-IRNode* create_pop_reg(int num) {
-    IRNode *node = create_ir_node(IR_POP_REG);
-    node->pop_reg.num = num;
-    return node;
-}
-
-IRNode* create_mov(int from, int to){
-    IRNode *node = create_ir_node(IR_MOV);
-    node->mov.from = from;
-    node->mov.to = to;
-    return node;
-}
-
-IRNode* create_return() {
-    IRNode *node = create_ir_node(IR_RETURN);
-    return node;
-}
-
-IRNode* create_print() {
-    IRNode *node = create_ir_node(IR_PRINT);
-    return node;
-}
-
-IRNode* create_var(char name) {
-    IRNode *node = create_ir_node(IR_VAR);
-    node->var_const.var_pos = find_var(current_function, name);
-    return node;
-}
-
-IRNode* create_start(const char *name) {
-    IRNode *node = create_ir_node(IR_START);
-    strncpy(node->start.name, name, sizeof(node->start.name));
-    return node;
-}
-
-IRNode* create_const(double value) {
-    IRNode *node = create_ir_node(IR_CONST);
-    node->var_const.num_value = value;
-    return node;
-}
-
-IRNode* create_res_push(){
-    IRNode* node = create_ir_node(IR_RES_PUSH);
-    return node;
-}
-
-static const char* op_to_str(IROperator op) {
-    switch(op) {
-        case OP_ADD: return "+";
-        case OP_SUB: return "-";
-        case OP_MUL: return "*";
-        case OP_DIV: return "/";
-        case OP_SIN:
-        case OP_COS:
-        case OP_ARCSIN:
-        case OP_ARCCOS:
-        case OP_LOG:
-        case OP_LN:
-        // case OP_E:
-        case OP_PI:
-        case OP_SQRT:
-        default: return "?";
+    for (int i = 0; i < funcs->nfuncs; i++){
+        LinkList(funcs->funcs[i].list);
     }
 }
+
+#define type(curr) curr->node->type
+
+void LinkList(IRList* ir){
+    if (!ir) return;
+    for (int i = 0; i < ir->count; i++){
+
+        LList* curr = ir->start + i;
+        if (!i) {curr->next = ir->start + 1; curr->prev = NULL; continue;}
+        if (i == ir->count - 1) {curr->prev = ir->start + i - 1; curr->next = NULL; continue;}
+        curr->prev = ir->start + i - 1;
+        curr->next = ir->start + i + 1;
+    }
+}
+
+
+// ==========================================================================================
 
 IRFuncs* TranslateToIR(Function* functions, int nfuncs){
 
@@ -134,8 +73,7 @@ IRFuncs* TranslateToIR(Function* functions, int nfuncs){
 
     for (int cnt = 0; cnt < nfuncs; cnt++){
 
-        IRList* ir = (IRList*) calloc (1, sizeof(IRList));
-        ir->node = create_start(functions[cnt].name);
+        IRList* ir = InitIR(functions[cnt].name);
 
         allfuncs->funcs[cnt].nargs = functions[cnt].nargs;
         allfuncs->funcs[cnt].nlocals = functions[cnt].nlocals;
@@ -154,49 +92,163 @@ IRFuncs* TranslateToIR(Function* functions, int nfuncs){
     return allfuncs;
 }
 
-
-
-// list append?
-#define ADD_NODE(n) \
-    {\
-    IRList* newnode = (IRList*) calloc (1, sizeof(IRList)); \
-    newnode->node = n;\
-    newnode->prev = ir;\
-    ir->next = newnode;\
-    ir = newnode;\
-    }
-
-#define REC_PUSH_CALL \
-    Tree->curr_node = &curr->left;\
-    ir = IRParseFuncTree(Tree, funcs, ir);\
-    ADD_NODE(create_res_push());\
-    Tree->curr_node = &curr->right;\
-    ir = IRParseFuncTree(Tree, funcs, ir);\
-    ADD_NODE(create_res_push());
+#define ADD_NODE(node) \
+    ListAppend(ir, node);
 
 #define REC_CALL \
     Tree->curr_node = &curr->left;\
-    ir = IRParseFuncTree(Tree, funcs, ir);\
+    IRParseFuncTree(Tree, funcs, ir);\
     Tree->curr_node = &curr->right;\
-    ir = IRParseFuncTree(Tree, funcs, ir);\
+    IRParseFuncTree(Tree, funcs, ir);\
+
+// Parse Tree=======================================================================================
+
+void IRParseFuncTree(e_tree *Tree, IRFuncs* funcs, IRList* ir) {
+
+    e_node* curr = *Tree->curr_node;
+    if (curr == NULL) return;
+
+    printf("TYPE: %d \n", curr->type);
+
+    switch(curr->type) {
+        case NUM:       handle_num_case(curr, ir);            break;
+        case VAR:       handle_var_case(curr, ir);            break;
+        case OPER:      handle_oper_case(Tree, funcs, ir);    break;
+        case KEYWORD:   handle_keyword_case(Tree, funcs, ir); break;
+        case NEXT:      handle_next_case(Tree, funcs, ir);    break;
+        case FUNC:      handle_func_case(Tree, funcs, ir);    break;
+        default:        break;
+    }
+}
+
+void handle_num_case(e_node *curr, IRList *ir) {
+    ADD_NODE(create_const(curr->value.number));
+    ADD_NODE(create_res_push());
+}
+
+void handle_var_case(e_node *curr, IRList *ir) {
+    ADD_NODE(create_var((char)curr->value.var));
+    ADD_NODE(create_res_push());
+}
+
+void handle_oper_case(e_tree *Tree, IRFuncs *funcs, IRList *ir) {
+
+    e_node* curr = *Tree->curr_node;
+    REC_CALL;
+
+    IROperator op = OP_ADD;
+#define OPERATOR(name, ...) case name: op = OP_##name; puts(#name "\n"); break;
+
+    switch (curr->value.var) {
+        #include "operators.h"
+        default: fputs("unknown operator", stderr);
+    }
+
+#undef OPERATOR
+
+    ADD_NODE(create_pop_reg(REG_RBX));
+    ADD_NODE(create_pop_reg(REG_RAX));
+    ADD_NODE(create_binop(op));
+    ADD_NODE(create_res_push());
+}
+
+void handle_keyword_case(e_tree *Tree, IRFuncs *funcs, IRList *ir) {
+    e_node* curr = *Tree->curr_node;
+    printf("keyword type: %ld\n", curr->value.var);
+
+    switch (curr->value.var) {
+        case EMPTY:     REC_CALL; break;
+        case PRINT:     handle_print_case(Tree, funcs, ir); break;
+        case EQUAL:     handle_equal_case(Tree, funcs, ir); break;
+        case IF:        handle_if_case(Tree, funcs, ir);    break;
+        case BACK:      handle_back_case(Tree, funcs, ir);  break;
+        default:        break;
+    }
+}
+
+void handle_print_case(e_tree *Tree, IRFuncs *funcs, IRList *ir) {
+    e_node* curr = *Tree->curr_node;
+    REC_CALL;
+    ADD_NODE(create_pop_reg(REG_RAX));
+    ADD_NODE(create_print());
+}
+
+void handle_equal_case(e_tree *Tree, IRFuncs *funcs, IRList *ir) {
+    e_node* curr = *Tree->curr_node;
+
+    if (curr->right) {
+        Tree->curr_node = &curr->right;
+        IRParseFuncTree(Tree, funcs, ir);
+    } else {
+        ADD_NODE(create_input());
+    }
+
+    IRNode* var = create_var((char)curr->left->value.var);
+    ADD_NODE(create_assign(var->var_const.var_pos));
+    free(var);
+}
+
+void handle_if_case(e_tree *Tree, IRFuncs *funcs, IRList *ir) {
+
+    e_node* curr = *Tree->curr_node;
+    Tree->curr_node = &curr->left;
+    IRParseFuncTree(Tree, funcs, ir);
+
+    ADD_NODE(create_pop_reg(REG_RAX));
+    int false_label = new_label();
+    int end_label = (curr->right && curr->right->type != NEXT) ? new_label() : false_label;
+
+    ADD_NODE(create_cjump(false_label));
+
+    Tree->curr_node = &curr->right;
+    IRParseFuncTree(Tree, funcs, ir);
+
+    if (curr->right && curr->right->type != NEXT) {
+        ADD_NODE(create_jump(end_label));
+        ADD_NODE(create_label(false_label));
+    }
+    ADD_NODE(create_label(end_label));
+}
+
+void handle_back_case(e_tree *Tree, IRFuncs *funcs, IRList *ir) {
+    e_node* curr = *Tree->curr_node;
+    REC_CALL;
+    if (curr->left || curr->right) {
+        ADD_NODE(create_pop_reg(REG_RAX));
+    }
+    ADD_NODE(create_return());
+
+}
+
+void handle_next_case(e_tree *Tree, IRFuncs *funcs, IRList *ir) {
+    e_node* curr = *Tree->curr_node;
+    REC_CALL;
+}
+
+void handle_func_case(e_tree *Tree, IRFuncs *funcs, IRList *ir) {
+    e_node* curr = *Tree->curr_node;
+    REC_CALL;
+    ADD_NODE(create_call(funcs->funcs[curr->value.var].name,
+                       funcs->funcs[curr->value.var].nargs));
+    ADD_NODE(create_res_push());
+    puts("CALL");
+}
+
+// Library =============================================================================================================
 
 void AddLibProt(IRFunction* funcs){
 
-    // IRList* save = NULL;
     //READ
 
     funcs[0].nargs = 0;
     funcs[0].nlocals = 0;
     funcs[0].name = strdup("read");
 
-    IRList* ir = (IRList*) calloc (1, sizeof(IRList));
+    IRList* ir = InitIR(funcs[0].name);
     funcs[0].list = ir;
-    ir->node = create_start(funcs[0].name);
 
     ADD_NODE(create_call(funcs[0].name, 0));
     ADD_NODE(create_return());
-
-
 
     //PRINT
 
@@ -204,9 +256,8 @@ void AddLibProt(IRFunction* funcs){
     funcs[1].nlocals = 0;
     funcs[1].name = strdup("print");
 
-    ir = (IRList*) calloc (1, sizeof(IRList));
+    ir = InitIR(funcs[1].name);
     funcs[1].list = ir;
-    ir->node = create_start(funcs[1].name);
 
     ADD_NODE(create_call(funcs[1].name, 0));
     ADD_NODE(create_return());
@@ -218,132 +269,14 @@ void AddLibProt(IRFunction* funcs){
     funcs[2].name = strdup("end");
 }
 
-IRList*  IRParseFuncTree(e_tree *Tree, IRFuncs* funcs, IRList* ir) {
-
-    e_node* curr = *Tree->curr_node;
-    if (curr == NULL) return ir;
-    // dump_ir(ir, stdout);
-    printf("TYPE: %d \n", curr->type);
-    // На функции ->
-    switch(curr->type) {
-        case NUM:
-            ADD_NODE(create_const(curr->value.number));
-            ADD_NODE(create_res_push());
-
-            return ir;
-        case VAR:
-            ADD_NODE(create_var((char) curr->value.var));
-            ADD_NODE(create_res_push());
-            return ir;
-
-        case OPER: {
-            puts("OPERATOR");
-            REC_CALL;
-
-            IROperator op = OP_ADD;
-
-#define OPERATOR(name, ...) case name: op = OP_##name; puts(#name "\n"); break;
-
-            switch (curr->value.var){
-
-                #include "operators.h"
-
-                default: fputs("unknown operator", stderr);
-            }
-
-#undef OPERATOR
-
-            ADD_NODE(create_pop_reg(REG_RBX));
-            ADD_NODE(create_pop_reg(REG_RAX));
-            ADD_NODE(create_binop(op));
-            ADD_NODE(create_res_push());
-            return ir;
-        }
-
-        case KEYWORD: {
-            printf("keyword type: %ld\n", curr->value.var);
-            switch (curr->value.var) {
-
-                case EMPTY:
-                    REC_CALL;
-                    return ir;;
-
-                case PRINT:
-                    REC_CALL;
-                    ADD_NODE(create_pop_reg(REG_RAX));
-                    ADD_NODE(create_print());
-                    return ir;
-
-                case EQUAL: {
-                    if (curr->right != NULL){
-                        Tree->curr_node = &curr->right;
-                        ir = IRParseFuncTree(Tree, funcs, ir);
-                    }
-                    else {
-                        ADD_NODE(create_input());
-                    }
-                    IRNode* var = create_var((char)curr->left->value.var);
-                    ADD_NODE(create_assign(var->var_const.var_pos));
-                    free(var);
-                    return ir;
-                }
-
-                case IF: {
+#undef ADD_NODE
+#undef REC_CALL
 
 
-                    Tree->curr_node = &curr->left;
-                    ir = IRParseFuncTree(Tree, funcs, ir);
+// UTILS ================================================================================================================
 
-                    ADD_NODE(create_pop_reg(REG_RAX));
-                    int false_label = new_label();
-                    int end_label = 0;
-
-                    if (curr->right != NULL && curr->right->type != NEXT)
-                         end_label = new_label();
-                    else end_label = false_label;
-
-                    ADD_NODE(create_cjump(false_label));
-
-                    Tree->curr_node = &curr->right;
-                    ir = IRParseFuncTree(Tree, funcs, ir);
-
-                    if (curr->right != NULL && curr->right->type != NEXT){
-                        ADD_NODE(create_jump(end_label));
-                        ADD_NODE(create_label(false_label));
-                    }
-                    ADD_NODE(create_label(end_label));
-
-                    return ir;
-                }
-
-                case BACK: {
-                    REC_CALL;
-                    if (curr->left != NULL || curr->right != NULL)
-                        ADD_NODE(create_pop_reg(REG_RAX));
-                    ADD_NODE(create_return());
-                    return ir;
-                }
-            }
-            return ir;
-        }
-
-        case NEXT:
-            REC_CALL;
-            return ir;
-
-        case FUNC: {
-            REC_CALL;
-
-            ADD_NODE(create_call(funcs->funcs[curr->value.var].name, funcs->funcs[curr->value.var].nargs));
-            ADD_NODE(create_res_push());
-            puts("CALL");
-            return ir;
-        }
-
-        default:
-            return ir;
-    }
-    return ir;
+int new_label() {
+    return label_counter++;
 }
 
 int find_var(Function* curr_func, const char name){
@@ -379,25 +312,7 @@ int find_var(Function* curr_func, const char name){
 //DUMP IR ========================================================================================================
 
 FILE* logFile = fopen("logfile.log", "w");
-
-const char* get_type(IRNodeType type){
-    switch (type){
-        case IR_LABEL:  return "Label" ;
-        case IR_ASSIGN: return "Assign";
-        case IR_BINOP:  return "Binop" ;
-        case IR_UNOP:   return "Unop"  ;
-        case IR_CALL:   return "Call"  ;
-        case IR_JUMP:   return "Jump"  ;
-        case IR_CJUMP:  return "Cjump" ;
-        case IR_RETURN: return "Return";
-        case IR_PRINT:  return "Print" ;
-        case IR_VAR:    return "Var"   ;
-        case IR_CONST:  return "Const" ;
-        case IR_START:  return "Start" ;
-        case IR_RES_PUSH: return "PushRes";
-        default: return "Error";
-    }
-}
+static const char* op_to_str(IROperator op);
 
 void DumpIR(IRFuncs* ir, int nfuncs)
 {
@@ -409,19 +324,19 @@ void DumpIR(IRFuncs* ir, int nfuncs)
     for (int i = 0; i < nfuncs; i++){
         print("---------------(New Func)---------------------\n");
         puts(ir->funcs[i].name);
-        dump_ir(ir->funcs[i].list, logFile);
+        dump_ir(ir->funcs[i].list->start, logFile);
     }
 
     #undef print
 }
 
 
-void dump_ir(IRList *ir_list, FILE *out) {
-    if (!ir_list || !out) return;
+void dump_ir(LList *ir_list, FILE *out) {
+    if (!ir_list ) return;
 
     fprintf(out, "=================== FUNC DUMP ===================\n");
 
-    IRList *current = ir_list;
+    LList *current = ir_list;
     printf("%p", current);
     puts("");
     while (current != NULL) {
@@ -514,4 +429,22 @@ const char* get_reg_name(int reg_num) {
     };
 
     return reg_names[reg_num];
+}
+
+static const char* op_to_str(IROperator op) {
+    switch(op) {
+        case OP_ADD: return "+";
+        case OP_SUB: return "-";
+        case OP_MUL: return "*";
+        case OP_DIV: return "/";
+        case OP_SIN:
+        case OP_COS:
+        case OP_ARCSIN:
+        case OP_ARCCOS:
+        case OP_LOG:
+        case OP_LN:
+        case OP_PI:
+        case OP_SQRT:
+        default: return "?";
+    }
 }

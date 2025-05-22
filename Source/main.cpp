@@ -11,6 +11,7 @@ int main(void){
     int nfuncs = ParseFuncs("./Progs/1st", &e);
     // Translator(e, "arab.txt", nfuncs);
     IRFuncs* a = TranslateToIR(e, nfuncs);
+    Link(a);
     ProcessIR(a);
     puts("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
     DumpIR(a, nfuncs);

@@ -207,7 +207,7 @@ case (name):{\
 
         default: {
             fputs("Unknown operator", stderr);
-            return UNKNOWN_OPETOR;
+            return UNKNOWN_OPERATOR;
         }
     }
 
